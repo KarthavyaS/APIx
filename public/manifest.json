@@ -1,0 +1,22 @@
+{
+  "name": "Airfare Price Index (APIx) - Government of India",
+  "short_name": "APIx India",
+  "description": "National Statistical Office (NSO) & MoSPI Official Domestic Airfare Price Index and Inflation Observatory",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

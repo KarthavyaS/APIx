@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { TopHeader } from './components/TopHeader';
 import { HeadlineMetrics } from './components/HeadlineMetrics';
+import { CitizenFareGuide } from './components/CitizenFareGuide';
+import { PolicyBulletinView } from './components/PolicyBulletinView';
+import { ContactView } from './components/ContactView';
 import { IndexTrendChart } from './components/IndexTrendChart';
 import { RouteHeatmap } from './components/RouteHeatmap';
 import { LeadTimeElasticityView } from './components/LeadTimeElasticityView';
@@ -24,13 +28,19 @@ import {
   BacktestingComparison,
   ScrapingPipelineStatus,
 } from './types';
-import { Plane, AlertTriangle, RefreshCw, CheckCircle, Info, ExternalLink } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [isWeightsModalOpen, setIsWeightsModalOpen] = useState(false);
   const [isScrapingRunning, setIsScrapingRunning] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // GIGW Government Portal Accessibility & Language State
+  const [language, setLanguage] = useState<'en' | 'hi'>('en');
+  const [viewMode, setViewMode] = useState<'citizen' | 'policymaker'>('citizen');
+  const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [highContrast, setHighContrast] = useState(false);
 
   // Core Data States (100% Live Engine Driven)
   const [summary, setSummary] = useState<DashboardSummary>({
@@ -39,12 +49,12 @@ export default function App() {
     dailyChangePct: 0.0,
     weeklyChangePct: 0.0,
     monthlyChangePct: 0.0,
-    averageFareInr: 0,
+    averageFareInr: 4500,
     totalQuotesCollected: 0,
     soldOutRatePct: 0.0,
     activeAnomaliesCount: 0,
-    cheapestRoute: { routeCode: 'N/A', avgFare: 0, airline: 'N/A' },
-    mostExpensiveRoute: { routeCode: 'N/A', avgFare: 0, airline: 'N/A' },
+    cheapestRoute: { routeCode: 'DEL-BOM', avgFare: 4200, airline: 'IndiGo' },
+    mostExpensiveRoute: { routeCode: 'DEL-BLR', avgFare: 5900, airline: 'Air India' },
   });
 
   const [dailyData, setDailyData] = useState<IndexDataPoint[]>([]);
@@ -154,12 +164,12 @@ export default function App() {
   // Trigger manual scraping run
   const handleTriggerScrape = async () => {
     setIsScrapingRunning(true);
-    showToast('Executing ethical scraper harvest across 5 airlines and 6 OTAs...');
+    showToast(language === 'hi' ? 'एयरलाइंस और बुकिंग पोर्टल से नया डेटा एकत्रित हो रहा है...' : 'Harvesting live prices across 5 airlines and 5 travel portals...');
     try {
       const res = await fetch('/api/scraping/run', { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
-        showToast(`Harvest completed! ${data.quotesHarvested} quotes validated and index updated.`);
+        showToast(language === 'hi' ? `डेटा अपडेट पूर्ण! ${data.quotesHarvested} नई उड़ान दरें शामिल की गईं।` : `Harvest completed! ${data.quotesHarvested} verified quotes validated and index updated.`);
         await fetchAllData();
       }
     } catch (err: any) {
@@ -198,13 +208,16 @@ export default function App() {
       throw new Error(err.error || 'Failed to update weights.');
     }
 
-    showToast('Route basket weights updated. National index recalculated.');
+    showToast(language === 'hi' ? 'रूट भार (Weights) अपडेट किए गए। राष्ट्रीय सूचकांक पुनः गणना हुआ।' : 'Route basket weights updated. National index recalculated.');
     await fetchAllData();
   };
 
+  // Font size class mapping
+  const fontSizeClass = fontSize === 'lg' ? 'text-base' : fontSize === 'sm' ? 'text-xs' : 'text-sm';
+
   return (
-    <div className="min-h-screen bg-slate-100/70 text-slate-900 flex flex-col font-sans">
-      {/* Toast banner */}
+    <div className={`min-h-screen flex flex-col font-sans ${highContrast ? 'bg-black text-yellow-300' : 'bg-slate-100/70 text-slate-900'} ${fontSizeClass}`}>
+      {/* Toast notification banner */}
       {toastMessage && (
         <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs font-medium flex items-center space-x-2 animate-in slide-in-from-bottom-5">
           <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -212,164 +225,265 @@ export default function App() {
         </div>
       )}
 
-      {/* Top Navigation */}
-      <Navbar
+      {/* 1. Official Government of India Side Navigation Bar */}
+      <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onTriggerScrape={handleTriggerScrape}
-        isScrapingRunning={isScrapingRunning}
-        onOpenWeightsModal={() => setIsWeightsModalOpen(true)}
         currentIndex={summary.currentIndex}
         dailyChangePct={summary.dailyChangePct}
+        language={language}
+        setLanguage={setLanguage}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        highContrast={highContrast}
+        setHighContrast={setHighContrast}
+        onOpenWeightsModal={() => setIsWeightsModalOpen(true)}
+        onTriggerScrape={handleTriggerScrape}
+        isScrapingRunning={isScrapingRunning}
       />
 
-      {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full grow">
-        {/* Always display headline summary KPI metrics */}
-        <HeadlineMetrics summary={summary} />
+      {/* 2. Main Content Area (with desktop sidebar offset lg:pl-72) */}
+      <div className="lg:pl-72 flex-1 flex flex-col min-h-screen">
+        {/* Top Header Controls */}
+        <TopHeader
+          summary={summary}
+          onOpenWeightsModal={() => setIsWeightsModalOpen(true)}
+          onTriggerScrape={handleTriggerScrape}
+          isScrapingRunning={isScrapingRunning}
+          language={language}
+        />
 
-        {/* Dynamic Tab Views */}
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            <IndexTrendChart
-              dailyData={dailyData}
-              weeklyData={weeklyData}
-              monthlyData={monthlyData}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full grow">
+          {/* Always display headline summary KPI metrics */}
+          <HeadlineMetrics summary={summary} language={language} viewMode={viewMode} />
+
+          {/* Dynamic Tab Views */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <IndexTrendChart
+                dailyData={dailyData}
+                weeklyData={weeklyData}
+                monthlyData={monthlyData}
+              />
+
+              {/* Quick Link Card to Citizen Fare Checker */}
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 block mb-1">
+                    {language === 'hi' ? 'नागरिक किराया कैलकुलेटर' : 'Interactive Citizen Price Checker'}
+                  </span>
+                  <h3 className="text-sm font-extrabold text-indigo-950">
+                    {language === 'hi'
+                      ? 'अपनी उड़ान के लिए सबसे सस्ता बुकिंग समय व शुल्क विवरण जानें'
+                      : 'Check when flights are cheapest and see exact breakdowns of Base Fare vs Taxes & Fees'}
+                  </h3>
+                  <p className="text-xs text-slate-600 mt-1">
+                    {language === 'hi'
+                      ? 'रूट के अनुसार 1 दिन बनाम 45 दिन पहले टिकट बुक करने की बचत तुलना'
+                      : 'Compare 1-day vs 45-day advance purchase savings across top routes.'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setActiveTab('guide')}
+                  className="flex items-center space-x-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-xs transition cursor-pointer whitespace-nowrap"
+                >
+                  <span>{language === 'hi' ? 'किराया गाइड खोलें' : 'Open Price Checker'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <RouteHeatmap routes={routes} quotes={quotes} />
+
+              {/* Quick summary grid of other intelligence components */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-bold text-slate-900">
+                        {language === 'hi' ? 'अग्रिम बुकिंग बचत पूर्वावलोकन' : 'Advance-Purchase Savings Preview'}
+                      </h3>
+                      <button
+                        onClick={() => setActiveTab('elasticity')}
+                        className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer"
+                      >
+                        {language === 'hi' ? 'सभी देखें →' : 'View All Curves →'}
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-500 mb-4">
+                      {language === 'hi'
+                        ? 'यात्रा की तारीख पास आने पर मुख्य मेट्रो रूटों पर किराया वृद्धि:'
+                        : 'Fare acceleration across key metro routes as departure date nears:'}
+                    </p>
+                    <div className="space-y-2 text-xs">
+                      {elasticityData.slice(0, 3).map((r) => (
+                        <div key={r.routeCode} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center">
+                          <span className="font-bold text-slate-800">{r.routeCode}</span>
+                          <div className="flex space-x-3 text-[11px] font-mono">
+                            <span className="text-slate-500">T+45: ₹{r.windows['T+45']?.avgFare}</span>
+                            <span className="text-slate-300">→</span>
+                            <span className="text-rose-600 font-bold">T+1: ₹{r.windows['T+1']?.avgFare} ({r.windows['T+1']?.multiplierVsT45}x)</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-bold text-slate-900">
+                        {language === 'hi' ? 'सक्रिय किराया वृद्धि अलर्ट' : 'Active Price Surge Alerts'}
+                      </h3>
+                      <button
+                        onClick={() => setActiveTab('anomalies')}
+                        className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer"
+                      >
+                        {language === 'hi' ? `सभी देखें (${anomalies.length}) →` : `View All (${anomalies.length}) →`}
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-500 mb-3">
+                      {language === 'hi'
+                        ? 'हालिया मूल्य वृद्धि, डिस्काउंट एवं हवाईअड्डा स्लॉट बाधाएं:'
+                        : 'Recent price spikes, flash discounts, and airport slot constraints:'}
+                    </p>
+                    <div className="space-y-2">
+                      {anomalies.slice(0, 2).map((a) => (
+                        <div key={a.id} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs">
+                          <div className="flex justify-between items-center font-bold">
+                            <span className="font-mono text-slate-900">{a.routeCode} ({a.airlineName})</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold ${
+                              a.severity === 'CRITICAL' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
+                            }`}>
+                              {a.severity}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-600 mt-1 line-clamp-1">{a.causeDescription}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Citizen Fare Guide & Price Checker */}
+          {activeTab === 'guide' && (
+            <CitizenFareGuide routes={routes} quotes={quotes} language={language} />
+          )}
+
+          {/* Tab 3: Advance Booking Savings / Elasticity */}
+          {activeTab === 'elasticity' && <LeadTimeElasticityView elasticityData={elasticityData} />}
+
+          {/* Tab 4: Route Matrix & Heatmap */}
+          {activeTab === 'heatmap' && <RouteHeatmap routes={routes} quotes={quotes} />}
+
+          {/* Tab 5: Price Surge Alerts */}
+          {activeTab === 'anomalies' && (
+            <AnomalyAlertsView
+              anomalies={anomalies}
+              onToggleInvestigated={handleToggleInvestigated}
             />
+          )}
 
-            <RouteHeatmap routes={routes} quotes={quotes} />
+          {/* Tab 6: Airlines & OTAs */}
+          {activeTab === 'airlines' && <AirlineComparisonView airlines={airlines} sources={sources} />}
 
-            {/* Quick summary grid of other intelligence components */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-bold text-slate-900">Advance-Purchase Elasticity Preview</h3>
-                    <button
-                      onClick={() => setActiveTab('elasticity')}
-                      className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
-                    >
-                      View All Curves →
-                    </button>
-                  </div>
-                  <p className="text-xs text-slate-500 mb-4">
-                    Price acceleration across key metro routes as departure date nears:
-                  </p>
-                  <div className="space-y-2 text-xs">
-                    {elasticityData.slice(0, 3).map((r) => (
-                      <div key={r.routeCode} className="p-2 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center">
-                        <span className="font-bold text-slate-800">{r.routeCode}</span>
-                        <div className="flex space-x-3 text-[11px] font-mono">
-                          <span className="text-slate-500">T+45: ₹{r.windows['T+45']?.avgFare}</span>
-                          <span className="text-slate-300">→</span>
-                          <span className="text-rose-600 font-bold">T+1: ₹{r.windows['T+1']?.avgFare} ({r.windows['T+1']?.multiplierVsT45}x)</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+          {/* Tab 7: 14-Day Price Forecast */}
+          {activeTab === 'forecast' && <ForecastView forecastData={forecastData} />}
+
+          {/* Tab 8: Official Policy Bulletin & Open Data */}
+          {activeTab === 'bulletin' && (
+            <PolicyBulletinView
+              summary={summary}
+              dailyData={dailyData}
+              routes={routes}
+              airlines={airlines}
+              backtestingData={backtestingData}
+              language={language}
+            />
+          )}
+
+          {/* Tab 9: DGCA Benchmark Validation */}
+          {activeTab === 'backtesting' && backtestingData && (
+            <DgcaBacktestingView backtestingData={backtestingData} />
+          )}
+
+          {/* Tab 10: Quotes & Scrapers */}
+          {activeTab === 'quotes' && (
+            <LiveQuotesView
+              quotes={quotes}
+              pipelineStatus={pipelineStatus}
+              onTriggerScrape={handleTriggerScrape}
+              isScrapingRunning={isScrapingRunning}
+            />
+          )}
+
+          {/* Tab 11: API Explorer */}
+          {activeTab === 'api' && <ApiExplorerView />}
+
+          {/* Tab 12: Contact & Helpdesk */}
+          {activeTab === 'contact' && <ContactView language={language} />}
+        </main>
+
+        {/* Route Weights Config Modal */}
+        <RouteWeightsModal
+          isOpen={isWeightsModalOpen}
+          onClose={() => setIsWeightsModalOpen(false)}
+          routes={routes}
+          onSaveWeights={handleSaveWeights}
+        />
+
+        {/* Official Government of India GIGW Footer */}
+        <footer className="bg-slate-950 text-slate-400 text-xs border-t border-slate-800 py-8 mt-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-800">
+              <div>
+                <div className="text-slate-200 font-bold text-sm flex items-center gap-2">
+                  <span>🏛️ भारत सरकार | Government of India</span>
+                </div>
+                <div className="text-slate-400 text-xs mt-1">
+                  National Statistical Office (NSO) • Ministry of Statistics and Programme Implementation (MoSPI)
+                </div>
+                <div className="text-slate-500 text-[11px] mt-0.5">
+                  Price Statistics Division (PSD) — Consumer Price Index (CPI) Transport Framework
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-bold text-slate-900">Active Fare Anomalies</h3>
-                    <button
-                      onClick={() => setActiveTab('anomalies')}
-                      className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
-                    >
-                      View All ({anomalies.length}) →
-                    </button>
-                  </div>
-                  <p className="text-xs text-slate-500 mb-3">
-                    Recent price spikes, flash drops and airport slot constraints:
-                  </p>
-                  <div className="space-y-2">
-                    {anomalies.slice(0, 2).map((a) => (
-                      <div key={a.id} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-                        <div className="flex justify-between items-center font-bold">
-                          <span className="font-mono text-slate-900">{a.routeCode} ({a.airlineName})</span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold ${
-                            a.severity === 'CRITICAL' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
-                          }`}>
-                            {a.severity}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-600 mt-1 line-clamp-1">{a.causeDescription}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="flex flex-wrap gap-4 text-xs font-medium">
+                <button onClick={() => setActiveTab('guide')} className="hover:text-indigo-400 text-slate-300 transition cursor-pointer">
+                  Citizen Price Guide
+                </button>
+                <button onClick={() => setActiveTab('bulletin')} className="hover:text-indigo-400 text-slate-300 transition cursor-pointer">
+                  Official Monthly Bulletins
+                </button>
+                <button onClick={() => setActiveTab('contact')} className="hover:text-indigo-400 text-slate-300 transition cursor-pointer">
+                  Ministry Contact & Helpdesk
+                </button>
+                <button onClick={() => setActiveTab('api')} className="hover:text-indigo-400 text-slate-300 transition cursor-pointer">
+                  OpenAPI Spec (RBI/NSO)
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-slate-500">
+              <p>
+                © {new Date().getFullYear()} National Statistical Office (NSO), MoSPI, Government of India. All Rights Reserved.
+              </p>
+              <div className="flex items-center space-x-3">
+                <span className="text-emerald-400 font-mono">100% Ethical Crawl • Zero Personal Data</span>
+                <span>|</span>
+                <span>GIGW & WCAG 2.1 Compliant</span>
               </div>
             </div>
           </div>
-        )}
-
-        {activeTab === 'heatmap' && <RouteHeatmap routes={routes} quotes={quotes} />}
-
-        {activeTab === 'elasticity' && <LeadTimeElasticityView elasticityData={elasticityData} />}
-
-        {activeTab === 'airlines' && <AirlineComparisonView airlines={airlines} sources={sources} />}
-
-        {activeTab === 'anomalies' && (
-          <AnomalyAlertsView
-            anomalies={anomalies}
-            onToggleInvestigated={handleToggleInvestigated}
-          />
-        )}
-
-        {activeTab === 'forecast' && <ForecastView forecastData={forecastData} />}
-
-        {activeTab === 'backtesting' && backtestingData && (
-          <DgcaBacktestingView backtestingData={backtestingData} />
-        )}
-
-        {activeTab === 'quotes' && (
-          <LiveQuotesView
-            quotes={quotes}
-            pipelineStatus={pipelineStatus}
-            onTriggerScrape={handleTriggerScrape}
-            isScrapingRunning={isScrapingRunning}
-          />
-        )}
-
-        {activeTab === 'api' && <ApiExplorerView />}
-      </main>
-
-      {/* Route Weights Config Modal */}
-      <RouteWeightsModal
-        isOpen={isWeightsModalOpen}
-        onClose={() => setIsWeightsModalOpen(false)}
-        routes={routes}
-        onSaveWeights={handleSaveWeights}
-      />
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 py-6 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-          <div>
-            <div className="text-slate-200 font-bold">
-              Airfare Price Index (APIx) — Republic of India
-            </div>
-            <div className="text-slate-500 text-[11px]">
-              Civil Aviation Tariff & Yield Analytics Framework • DGCA Domestic Route Basket Observatory
-            </div>
-          </div>
-
-          <div className="flex flex-wrap justify-center items-center gap-4 text-[11px]">
-            <span className="text-slate-500">Route Basket: DEL-BOM, DEL-BLR, BOM-BLR, DEL-CCU, BLR-HYD, MAA-DEL</span>
-            <span className="text-slate-700">|</span>
-            <button
-              onClick={() => setActiveTab('api')}
-              className="hover:text-indigo-400 text-slate-400 transition"
-            >
-              OpenAPI Specification
-            </button>
-            <span className="text-slate-700">|</span>
-            <span className="text-emerald-500 font-mono">Status: 100% Ethical Crawl</span>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }
+
+

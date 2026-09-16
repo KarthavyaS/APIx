@@ -3,10 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Airfare Price Index (APIx) - India Aviation Intelligence</title>
-    <meta name="description" content="Official Airfare Price Index (APIx) platform for India: weighted route baskets, lead-time fare elasticity, DGCA backtesting, anomaly detection, and ethical multi-source fare collection." />
-    <meta property="og:title" content="Airfare Price Index (APIx) - India Aviation Intelligence" />
-    <meta property="og:description" content="Official Airfare Price Index (APIx) platform for India: weighted route baskets, lead-time fare elasticity, DGCA backtesting, anomaly detection, and ethical multi-source fare collection." />
+    <title>Airfare Price Index (APIx) - Government of India | MoSPI & NSO</title>
+    <meta name="description" content="Official Airfare Price Index (APIx) platform: National Statistical Office (NSO) and Ministry of Statistics and Programme Implementation (MoSPI) transparent aviation inflation portal." />
+    
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="APIx India" />
+
+    <meta property="og:title" content="Airfare Price Index (APIx) - Government of India" />
+    <meta property="og:description" content="National Statistical Office (NSO) official retail airfare price index, dynamic tariff tracking & CPI Transport observatory." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +25,16 @@
   <body class="bg-slate-50 text-slate-900 antialiased font-sans selection:bg-indigo-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.log('Service Worker registration skipped/failed in dev:', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
+
 
