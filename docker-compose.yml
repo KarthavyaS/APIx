@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  apix-web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://apix_user:apix_secret@db:5432/apix_db
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: apix_user
+      POSTGRES_PASSWORD: apix_secret
+      POSTGRES_DB: apix_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

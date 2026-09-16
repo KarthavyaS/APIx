@@ -1,0 +1,6 @@
+{
+  "name": "Airfare Price Index (APIx) India",
+  "description": "National airfare price index, real-time fare monitoring, DGCA backtesting, advance-purchase elasticity, anomaly detection, and forecasting platform for Indian aviation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

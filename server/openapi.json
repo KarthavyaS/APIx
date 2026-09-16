@@ -1,0 +1,162 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Airfare Price Index (APIx) - India Aviation REST API",
+    "description": "Production REST API for real-time domestic airfare index calculation, route price baskets, fare elasticity curves, anomaly alerts, DGCA backtesting, and scraping pipeline monitoring across India's civil aviation corridors.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "APIx National Observatory",
+      "email": "apix-data@aviation.gov.in"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "Production API Server"
+    }
+  ],
+  "paths": {
+    "/index": {
+      "get": {
+        "summary": "Current Airfare Price Index summary",
+        "description": "Returns current headline index value, 24h/7d/30d change percentages, base period benchmark, and basket overview.",
+        "responses": {
+          "200": {
+            "description": "Headline index and latest statistics"
+          }
+        }
+      }
+    },
+    "/index/daily": {
+      "get": {
+        "summary": "Daily historical index series",
+        "description": "Retrieves continuous 35-day daily index time-series including route-level and airline-level sub-indices.",
+        "responses": {
+          "200": {
+            "description": "Historical time-series data"
+          }
+        }
+      }
+    },
+    "/index/weekly": {
+      "get": {
+        "summary": "Weekly aggregated index",
+        "description": "Returns weekly rolling aggregated price indices with variance.",
+        "responses": {
+          "200": {
+            "description": "Weekly aggregations"
+          }
+        }
+      }
+    },
+    "/index/monthly": {
+      "get": {
+        "summary": "Monthly index trends",
+        "description": "Returns monthly price indices aligned with DGCA domestic passenger yield reporting periods.",
+        "responses": {
+          "200": {
+            "description": "Monthly indices"
+          }
+        }
+      }
+    },
+    "/fares": {
+      "get": {
+        "summary": "Get normalized fare quotes",
+        "description": "Filterable and paginated real-time and harvested quotes with base fare, taxes, UDF, convenience fee, and anomaly flags.",
+        "parameters": [
+          { "name": "route", "in": "query", "schema": { "type": "string" }, "description": "Filter by route code (e.g. DEL-BOM)" },
+          { "name": "airline", "in": "query", "schema": { "type": "string" }, "description": "Filter by airline code (e.g. 6E, AI)" },
+          { "name": "advanceWindow", "in": "query", "schema": { "type": "string" }, "description": "Filter by advance purchase window (T+1, T+7, T+15, T+30, T+45)" },
+          { "name": "onlyAnomalies", "in": "query", "schema": { "type": "boolean" }, "description": "Filter to statistical anomalies only" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 50 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of fare quotes"
+          }
+        }
+      }
+    },
+    "/routes": {
+      "get": {
+        "summary": "List monitored route basket",
+        "description": "Returns all routes in the representative index basket with their dynamic weights, distances, and DGCA shares."
+      }
+    },
+    "/routes/weights": {
+      "post": {
+        "summary": "Update route weights dynamically",
+        "description": "Allows administrative adjustment of basket weights in the database without code redeployment, triggering real-time index recalculation.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "weights": {
+                    "DEL-BOM": 0.28,
+                    "DEL-BLR": 0.22,
+                    "BOM-BLR": 0.16,
+                    "DEL-CCU": 0.14,
+                    "BLR-HYD": 0.10,
+                    "MAA-DEL": 0.10
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/airlines": {
+      "get": {
+        "summary": "List airlines & market indicators",
+        "description": "Returns Indian carriers (IndiGo, Air India, Air India Express, Akasa Air, SpiceJet) with average yield and market shares."
+      }
+    },
+    "/sources": {
+      "get": {
+        "summary": "List scraping data sources & adapters",
+        "description": "Details active airline direct portals and OTAs with ethical compliance mode, robots.txt status, and rate limits."
+      }
+    },
+    "/analytics/forecast": {
+      "get": {
+        "summary": "14-day ML fare forecasts",
+        "description": "Provides machine-learning-derived fare projections with 95% confidence bounds and scheduled aviation events."
+      }
+    },
+    "/analytics/anomalies": {
+      "get": {
+        "summary": "Real-time anomaly alerts",
+        "description": "Identifies statistical fare spikes, flash drops, and capacity crunches using Z-score and Isolation Forest algorithms."
+      }
+    },
+    "/analytics/lead-time": {
+      "get": {
+        "summary": "Lead-time elasticity analysis",
+        "description": "Curves demonstrating price progression from early-bird T+45 down to departure day T+1 across all basket routes."
+      }
+    },
+    "/analytics/backtesting": {
+      "get": {
+        "summary": "DGCA benchmark backtesting module",
+        "description": "Statistical validation comparing calculated APIx index against official DGCA domestic passenger yield benchmarks (correlation, MAPE, RMSE)."
+      }
+    },
+    "/scraping/status": {
+      "get": {
+        "summary": "Scraping pipeline health & scheduler",
+        "description": "Status of automated background scrapers, harvest counts, recent pipeline logs, and adapter health."
+      }
+    },
+    "/scraping/run": {
+      "post": {
+        "summary": "Trigger manual scraping & processing cycle",
+        "description": "Executes the end-to-end data pipeline (Scrape → Validate → Normalize → Store → Compute Index → Run ML Analytics)."
+      }
+    }
+  }
+}

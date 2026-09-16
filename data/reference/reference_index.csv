@@ -1,0 +1,25 @@
+date,reference_index,source,description
+2026-01-01,94.20,DGCA Monthly Passenger Traffic Yield,Official DGCA monthly domestic yield index
+2026-02-01,95.50,DGCA Monthly Passenger Traffic Yield,Official DGCA monthly domestic yield index
+2026-03-01,97.10,DGCA Monthly Passenger Traffic Yield,Official DGCA monthly domestic yield index
+2026-04-01,99.40,DGCA Monthly Passenger Traffic Yield,Official DGCA monthly domestic yield index
+2026-05-01,104.80,DGCA Monthly Passenger Traffic Yield,Official DGCA monthly domestic yield index peak summer
+2026-06-01,102.30,DGCA Monthly Passenger Traffic Yield,Official DGCA monthly domestic yield index
+2026-07-01,98.60,DGCA Monthly Passenger Traffic Yield,Official DGCA monthly domestic yield index monsoon
+2026-08-01,100.00,DGCA Monthly Passenger Traffic Yield,Base Period benchmark
+2026-08-05,100.40,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-08-10,101.10,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-08-15,103.50,DGCA Passenger Yield Benchmark,Independence day peak
+2026-08-20,101.80,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-08-25,102.20,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-08-30,103.10,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-09-01,103.80,DGCA Monthly Passenger Traffic Yield,Official DGCA monthly domestic yield index
+2026-09-02,103.90,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-09-03,104.20,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-09-04,104.50,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-09-05,105.10,DGCA Passenger Yield Benchmark,Weekend peak
+2026-09-06,105.40,DGCA Passenger Yield Benchmark,Weekend peak
+2026-09-07,104.80,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-09-08,104.90,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-09-09,105.20,DGCA Passenger Yield Benchmark,Daily interpolated reference
+2026-09-10,105.60,DGCA Passenger Yield Benchmark,Daily interpolated reference
