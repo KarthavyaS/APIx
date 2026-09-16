@@ -82,6 +82,66 @@ Where:
 
 ---
 
+---
+
+## 🔑 Required API Keys & Environment Configuration
+
+To fetch **live market airfares** on your local machine, configure your API keys in a `.env` file. The engine uses a tiered adapter design: if an API key is missing or exceeds monthly limits, it automatically falls back to secondary adapters and OTA scrapers.
+
+### Summary of Keys
+
+| Environment Variable | Required / Optional | Purpose | Free Tier Limit | Where to Get |
+|----------------------|---------------------|---------|-----------------|--------------|
+| `SERPAPI_KEY` | **Recommended** (Primary) | Primary Tier 1 live flight search engine (Google Flights API) | **250 free searches / month** | [serpapi.com](https://serpapi.com/) |
+| `RAPIDAPI_KEY` | **Optional** (Backup) | Backup Tier 1 live flight adapter (DataCrawler Google Flights) | Free tier available | [rapidapi.com](https://rapidapi.com/) |
+| `DATABASE_URL` | **Optional** (Default: SQLite) | PostgreSQL connection string (e.g. Neon, Supabase, RDS) | Defaults to local SQLite | [neon.tech](https://neon.tech/) |
+| `GEMINI_API_KEY` | **Optional** | Google Gemini AI for smart analytics and insights | Free tier in AI Studio | [aistudio.google.com](https://aistudio.google.com/app/apikey) |
+
+---
+
+### Step-by-Step API Key Setup
+
+#### 1. Obtain SerpApi Key (Primary Data Source)
+1. Visit [https://serpapi.com](https://serpapi.com/) and create a free account.
+2. Navigate to your **Dashboard / API Key** section.
+3. Copy your private API key (e.g., `e4624a2e...`).
+4. Paste it as `SERPAPI_KEY` in your `.env` file.
+
+#### 2. (Optional) Obtain RapidAPI Key (Backup Data Source)
+1. Visit [https://rapidapi.com](https://rapidapi.com/) and register.
+2. Search for the **Google Flights Search / DataCrawler** API.
+3. Subscribe to the free plan.
+4. Copy your `X-RapidAPI-Key` from the endpoint testing panel.
+5. Paste it as `RAPIDAPI_KEY` in your `.env` file.
+
+#### 3. Create Your `.env` File
+Create a `.env` file in the project root directory (or in `backend/.env`):
+
+```bash
+# Copy from the template
+cp .env.example .env
+```
+
+Edit `.env` with your values:
+```dotenv
+# Primary Live Flight Scraper Key (Google Flights via SerpApi)
+SERPAPI_KEY="your_serpapi_key_here"
+
+# Backup Live Flight Scraper Key (RapidAPI)
+RAPIDAPI_KEY="your_rapidapi_key_here"
+
+# Database Connection (Leave commented or empty to use local SQLite)
+DATABASE_URL="sqlite:///backend/apix_airfare.db"
+
+# Optional Gemini AI Key
+GEMINI_API_KEY="your_gemini_api_key_here"
+```
+
+> [!TIP]
+> Both the root `.env` and `backend/.env` are automatically loaded by the Python engine. You only need to set it in either location.
+
+---
+
 ## 🚀 Quickstart
 
 ### Prerequisites
@@ -107,3 +167,4 @@ Interactive Swagger docs: [http://localhost:8000/docs](http://localhost:8000/doc
 ```bash
 pytest backend/tests/
 ```
+
