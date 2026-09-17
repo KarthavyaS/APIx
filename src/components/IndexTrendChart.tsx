@@ -97,57 +97,57 @@ export const IndexTrendChart: React.FC<IndexTrendChartProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs mb-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs mb-6 transition-colors">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
             Airfare Price Index (APIx) Time Series
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Weighted Laspeyres base aggregation benchmarked at 100.00 (Base Period: Aug 2026)
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
           {timeframe === 'daily' && (
-            <label className="flex items-center space-x-1.5 text-xs text-slate-600 mr-2 cursor-pointer">
+            <label className="flex items-center space-x-1.5 text-xs text-slate-600 dark:text-slate-400 mr-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={showSubRoutes}
                 onChange={(e) => setShowSubRoutes(e.target.checked)}
-                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5"
+                className="rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5"
               />
               <span>Route Basket Lines</span>
             </label>
           )}
 
-          <div className="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200">
+          <div className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700">
             <button
               onClick={() => setTimeframe('daily')}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
                 timeframe === 'daily'
-                  ? 'bg-white text-indigo-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Daily
             </button>
             <button
               onClick={() => setTimeframe('weekly')}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
                 timeframe === 'weekly'
-                  ? 'bg-white text-indigo-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Weekly
             </button>
             <button
               onClick={() => setTimeframe('monthly')}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
                 timeframe === 'monthly'
-                  ? 'bg-white text-indigo-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Monthly
@@ -158,7 +158,7 @@ export const IndexTrendChart: React.FC<IndexTrendChartProps> = ({
 
       <div className="h-72 w-full">
         {chartData.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50/50 rounded-lg border border-dashed border-slate-200">
+          <div className="h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50/50 dark:bg-slate-950/50 rounded-lg border border-dashed border-slate-200 dark:border-slate-800">
             <p className="text-xs font-medium">No index records found for the selected timeframe.</p>
             <p className="text-[11px] text-slate-400 mt-1">Trigger an ethical scrape run to compute new index points.</p>
           </div>
@@ -171,24 +171,24 @@ export const IndexTrendChart: React.FC<IndexTrendChartProps> = ({
                   <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94a3b830" />
               <XAxis
                 dataKey="label"
                 stroke="#94a3b8"
                 fontSize={11}
                 tickLine={false}
-                axisLine={{ stroke: '#e2e8f0' }}
+                axisLine={{ stroke: '#94a3b840' }}
               />
               <YAxis
                 domain={['auto', 'auto']}
                 stroke="#94a3b8"
                 fontSize={11}
                 tickLine={false}
-                axisLine={{ stroke: '#e2e8f0' }}
+                axisLine={{ stroke: '#94a3b840' }}
                 tickFormatter={(v) => Number(v).toFixed(0)}
               />
               <Tooltip content={<CustomTooltip />} />
-              <ReferenceLine y={100} stroke="#cbd5e1" strokeDasharray="4 4" label={{ value: 'Base 100.0', fill: '#94a3b8', fontSize: 10, position: 'insideTopLeft' }} />
+              <ReferenceLine y={100} stroke="#94a3b860" strokeDasharray="4 4" label={{ value: 'Base 100.0', fill: '#94a3b8', fontSize: 10, position: 'insideTopLeft' }} />
 
               <Area
                 type="monotone"
@@ -215,7 +215,7 @@ export const IndexTrendChart: React.FC<IndexTrendChartProps> = ({
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 mt-3 pt-3 border-t border-slate-100 text-xs text-slate-500">
+      <div className="flex flex-wrap items-center justify-between gap-4 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
         <div className="flex items-center space-x-4">
           <span className="flex items-center space-x-1.5">
             <span className="w-3 h-0.5 bg-indigo-600 inline-block"></span>
