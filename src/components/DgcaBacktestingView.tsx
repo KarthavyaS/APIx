@@ -30,7 +30,7 @@ export const DgcaBacktestingView: React.FC<DgcaBacktestingViewProps> = ({ backte
     !backtestingData ||
     !backtestingData.series ||
     backtestingData.series.length === 0 ||
-    (backtestingData.metrics && backtestingData.metrics.sampleDays < 30);
+    backtestingData.status === 'PENDING';
 
   if (isPending) {
     const samplesCount = backtestingData?.metrics?.sampleDays || 0;

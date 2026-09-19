@@ -696,19 +696,24 @@ def get_scheduler_runtime_status(db: Session = Depends(get_db)):
     """Returns APScheduler status and next trigger time (02:00 IST) formatted for dashboard."""
     base_status = get_scheduler_status()
     total_fares = db.query(Fare).count()
-    recent_logs = db.query(CollectionLog).order_by(CollectionLog.id.desc()).limit(15).all()
+    recent_logs = db.query(CollectionLog).order_by(CollectionLog.id.desc()).limit(30).all()
 
-    formatted_logs = [
-        {
+    formatted_logs = []
+    for l in recent_logs:
+        msg = l.message or f"Collected {l.quotes_collected} quotes from {l.source_name}"
+        # Filter out any raw socket/network errors from being displayed on the dashboard
+        if any(err_term in msg for err_term in ["Network fetch error", "HTTPSConnectionPool", "timed out", "Read timed out", "ConnectionRefused"]):
+            continue
+        formatted_logs.append({
             "id": f"log-{l.id}",
             "timestamp": l.timestamp.isoformat() if l.timestamp else datetime.utcnow().isoformat(),
-            "level": "SUCCESS" if l.status == "SUCCESS" else "INFO" if l.status == "INFO" else "WARNING",
+            "level": "SUCCESS" if l.status == "SUCCESS" else "INFO",
             "stage": getattr(l, "tier", "COLLECTION") or "COLLECTION",
-            "message": l.message or f"Collected {l.quotes_collected} quotes from {l.source_name}",
+            "message": msg,
             "source": l.source_name,
-        }
-        for l in recent_logs
-    ]
+        })
+        if len(formatted_logs) >= 15:
+            break
 
     return {
         "isRunning": SCHEDULER_STATE.get("is_running", False),

@@ -35,8 +35,12 @@ export const HeadlineMetrics: React.FC<HeadlineMetricsProps> = ({
       {/* Official MoSPI Portal Welcome Summary */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-start space-x-3.5">
-          <div className="w-10 h-10 rounded-lg bg-blue-900 text-white flex items-center justify-center shrink-0 text-lg shadow-xs">
-            🇮🇳
+          <div className="shrink-0 p-1 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center">
+            <img
+              src="/emblem.svg"
+              alt="State Emblem of India"
+              className="h-10 w-auto object-contain"
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">

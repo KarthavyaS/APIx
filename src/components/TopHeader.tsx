@@ -39,15 +39,26 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           <Menu className="w-4 h-4 text-blue-900" />
         </button>
 
+        {isCollapsed && (
+          <img
+            src="/emblem.svg"
+            alt="State Emblem of India"
+            className="hidden lg:block h-8 w-auto object-contain shrink-0"
+          />
+        )}
+
         <div className="flex items-center space-x-1.5 text-xs text-slate-600 font-medium">
-          <span className="text-slate-900 font-bold">भारत सरकार</span>
-          <span>•</span>
-          <span className="hidden sm:inline">MoSPI</span>
-          <span className="hidden sm:inline">›</span>
-          <span className="hidden md:inline">National Statistical Office</span>
+          <span className="text-slate-900 font-bold flex items-center gap-1.5">
+            <span className="inline-block w-2 h-2 rounded-full bg-orange-500" />
+            भारत सरकार
+          </span>
+          <span className="text-slate-300">|</span>
+          <span className="hidden sm:inline font-semibold text-slate-700">MoSPI</span>
+          <span className="hidden sm:inline text-slate-300">›</span>
+          <span className="hidden md:inline text-slate-700">National Statistical Office</span>
           {activeTabTitle && (
             <>
-              <span className="text-slate-400">›</span>
+              <span className="text-slate-300">›</span>
               <span className="text-blue-900 font-bold">{activeTabTitle}</span>
             </>
           )}

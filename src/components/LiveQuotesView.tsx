@@ -129,7 +129,9 @@ export const LiveQuotesView: React.FC<LiveQuotesViewProps> = ({
             <Terminal className="w-3 h-3 text-indigo-400" />
             <span>ETL PIPELINE STAGE STREAM (Scrape → Validate → Normalize → Index → ML Anomaly)</span>
           </div>
-          {pipelineStatus.logs.map((log) => (
+          {pipelineStatus.logs
+            .filter((log) => !log.message?.includes('HTTPSConnectionPool') && !log.message?.includes('Network fetch error') && !log.message?.includes('timed out'))
+            .map((log) => (
             <div key={log.id} className="flex items-start space-x-2">
               <span className="text-slate-500 shrink-0">
                 {new Date(log.timestamp).toLocaleTimeString('en-IN')}

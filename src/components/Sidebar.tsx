@@ -3,7 +3,6 @@ import {
   TrendingUp,
   HelpCircle,
   Activity,
-  Layers,
   BarChart3,
   AlertTriangle,
   Plane,
@@ -30,87 +29,14 @@ interface SidebarProps {
   setIsCollapsed?: (val: boolean) => void;
 }
 
-// Official State Emblem of India (Lion Capital of Ashoka) Vector Representation
-const IndiaEmblemSvg = () => (
-  <svg
-    viewBox="0 0 100 125"
-    className="w-12 h-16 shrink-0 drop-shadow-xs"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-label="State Emblem of India"
-  >
-    {/* Central & Side Lions Silhouette */}
-    <path
-      d="M50 14 C46 14 42 16 41 20 C38 18 34 19 32 23 C30 27 32 32 35 34 C33 37 34 42 38 45 C41 47 45 46 47 43 C48 45 52 45 53 43 C55 46 59 47 62 45 C66 42 67 37 65 34 C68 32 70 27 68 23 C66 19 62 18 59 20 C58 16 54 14 50 14 Z"
-      fill="#854d0e"
-    />
-    {/* Crown & Manes Details */}
-    <path
-      d="M44 24 C44 22 47 20 50 20 C53 20 56 22 56 24 C56 27 53 29 50 29 C47 29 44 27 44 24 Z"
-      fill="#ca8a04"
-    />
-    <circle cx="50" cy="24" r="2.5" fill="#713f12" />
-    <circle cx="39" cy="27" r="2" fill="#713f12" />
-    <circle cx="61" cy="27" r="2" fill="#713f12" />
-    
-    {/* Pillars & Abacus Base */}
-    <path
-      d="M32 48 L68 48 C70 48 71 50 70 52 L67 58 C66 60 64 61 62 61 L38 61 C36 61 34 60 33 58 L30 52 C29 50 30 48 32 48 Z"
-      fill="#a16207"
-    />
-
-    {/* Ashoka Chakra Wheel */}
-    <circle cx="50" cy="54.5" r="4.5" stroke="#1e3a8a" strokeWidth="1.2" fill="#ffffff" />
-    <circle cx="50" cy="54.5" r="1" fill="#1e3a8a" />
-    <line x1="50" y1="50" x2="50" y2="59" stroke="#1e3a8a" strokeWidth="0.6" />
-    <line x1="45.5" y1="54.5" x2="54.5" y2="54.5" stroke="#1e3a8a" strokeWidth="0.6" />
-    <line x1="46.8" y1="51.3" x2="53.2" y2="57.7" stroke="#1e3a8a" strokeWidth="0.6" />
-    <line x1="46.8" y1="57.7" x2="53.2" y2="51.3" stroke="#1e3a8a" strokeWidth="0.6" />
-
-    {/* Galloping Horse (Left) & Bull (Right) Mini Shapes */}
-    <path d="M36 53 C34 53 33 55 35 56 C36 57 38 56 38 54 Z" fill="#713f12" />
-    <path d="M64 53 C66 53 67 55 65 56 C64 57 62 56 62 54 Z" fill="#713f12" />
-
-    {/* Lotus Bell Base Foundation */}
-    <path
-      d="M26 63 C33 62 67 62 74 63 C76 64 75 67 73 68 L27 68 C25 67 24 64 26 63 Z"
-      fill="#854d0e"
-    />
-    <path
-      d="M30 68 L70 68 L68 73 L32 73 Z"
-      fill="#ca8a04"
-    />
-    <path
-      d="M24 74 L76 74 L78 77 L22 77 Z"
-      fill="#713f12"
-    />
-
-    {/* Official Satyameva Jayate (सत्यमेव जयते) Inscription */}
-    <text
-      x="50"
-      y="89"
-      textAnchor="middle"
-      fontSize="8.5"
-      fontWeight="900"
-      fontFamily="'Plus Jakarta Sans', 'Segoe UI', sans-serif"
-      fill="#78350f"
-      letterSpacing="0.5"
-    >
-      सत्यमेव जयते
-    </text>
-    <text
-      x="50"
-      y="98"
-      textAnchor="middle"
-      fontSize="5.5"
-      fontWeight="800"
-      fontFamily="'Plus Jakarta Sans', 'Segoe UI', sans-serif"
-      fill="#9a3412"
-      letterSpacing="0.8"
-    >
-      GOVERNMENT OF INDIA
-    </text>
-  </svg>
+// Official State Emblem of India (Lion Capital of Ashoka) Real Government Vector
+const OfficialEmblem: React.FC<{ className?: string }> = ({ className = 'h-14 w-auto' }) => (
+  <img
+    src="/emblem.svg"
+    alt="State Emblem of India (Lion Capital of Ashoka with Satyameva Jayate)"
+    className={`object-contain ${className}`}
+    loading="eager"
+  />
 );
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -155,12 +81,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       labelEn: 'Advance Booking Savings',
       labelHi: 'अग्रिम बुकिंग बचत (T+1 से T+45)',
       icon: Activity,
-    },
-    {
-      id: 'heatmap',
-      labelEn: 'Route Price Matrix',
-      labelHi: 'रूट किराया मैट्रिक्स',
-      icon: Layers,
     },
     {
       id: 'anomalies',
@@ -218,12 +138,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Mobile Top Header */}
       <div className="lg:hidden bg-white text-slate-900 border-b border-slate-200 p-3 flex justify-between items-center sticky top-0 z-50 shadow-xs">
         <div className="flex items-center space-x-3">
-          <IndiaEmblemSvg />
-          <div>
-            <span className="font-black text-base text-slate-900 tracking-tight flex items-center gap-1">
-              APIx <span className="text-orange-600 font-bold">| भारत सरकार</span>
+          <OfficialEmblem className="h-12 w-auto shrink-0" />
+          <div className="border-l border-slate-300 pl-2.5">
+            <span className="font-black text-sm text-slate-900 tracking-tight block">
+              भारत सरकार | Government of India
             </span>
-            <span className="text-xs text-slate-600 font-semibold block">Airfare Price Index • MoSPI</span>
+            <span className="text-[11px] text-slate-600 font-semibold block">
+              Airfare Price Index (APIx) • MoSPI
+            </span>
           </div>
         </div>
 
@@ -241,38 +163,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
           isCollapsed ? 'w-20' : 'w-80'
         } ${isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}
       >
-        {/* National Indian Tricolor Strip */}
-        <div className="h-1.5 bg-gradient-to-r from-orange-500 via-white to-emerald-600 w-full shrink-0" />
+        {/* National Indian Tricolor Header Ribbon (GIGW Guidelines) */}
+        <div className="h-1.5 bg-gradient-to-r from-[#FF9933] via-white to-[#138808] w-full shrink-0 shadow-xs" />
 
-        {/* 1. Official State Emblem Header with Large Visibility */}
-        <div className="p-4 border-b border-slate-200 bg-slate-50/90 shrink-0">
-          <div className="flex items-center space-x-3.5">
-            {/* Official State Emblem of India Vector Graphic */}
-            <div className="p-1.5 bg-amber-50/70 border border-amber-300 rounded-xl flex items-center justify-center shrink-0 shadow-xs">
-              <IndiaEmblemSvg />
+        {/* 1. Official State Emblem Header (Authentic National Government Portal Style) */}
+        <div className="p-4 border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white shrink-0">
+          <div className={`flex ${isCollapsed ? 'flex-col items-center' : 'items-start space-x-3'}`}>
+            {/* Real Official Lion Capital of Ashoka Emblem */}
+            <div className="shrink-0 flex items-center justify-center pt-0.5">
+              <OfficialEmblem className={isCollapsed ? 'h-12 w-auto' : 'h-16 w-auto'} />
             </div>
 
             {!isCollapsed && (
-              <div className="min-w-0 flex-1">
-                {/* Large Government Tag */}
-                <div className="flex items-center gap-1.5 text-xs font-black text-orange-700 uppercase tracking-wide">
-                  <span>भारत सरकार</span>
-                  <span className="text-slate-400 font-normal">•</span>
-                  <span>GOVERNMENT OF INDIA</span>
+              <div className="min-w-0 flex-1 border-l-2 border-slate-200/80 pl-3">
+                {/* Government Hierarchy */}
+                <div className="text-[11px] font-extrabold text-[#993D00] tracking-wide uppercase leading-tight">
+                  भारत सरकार
+                </div>
+                <div className="text-[10px] font-bold text-slate-700 tracking-wider uppercase leading-tight">
+                  GOVERNMENT OF INDIA
                 </div>
 
-                {/* Large Product Name */}
-                <h1 className="text-base sm:text-lg font-black text-slate-900 leading-tight tracking-tight mt-0.5">
-                  Airfare Price Index (APIx)
-                </h1>
+                {/* Ministry */}
+                <div className="text-[11px] font-bold text-blue-950 leading-snug mt-1">
+                  सांख्यिकी एवं कार्यक्रम कार्यान्वयन मंत्रालय
+                </div>
+                <div className="text-[10px] font-semibold text-slate-600 leading-tight">
+                  Ministry of Statistics & PI
+                </div>
 
-                {/* Large Government Explanation */}
-                <p className="text-xs font-bold text-blue-900 leading-tight mt-0.5">
-                  National Statistical Office (NSO)
-                </p>
-                <p className="text-[11px] font-semibold text-slate-600 leading-tight">
-                  Ministry of Statistics & Programme Implementation (MoSPI)
-                </p>
+                {/* Portal Title & Division */}
+                <div className="mt-1.5 pt-1.5 border-t border-slate-200">
+                  <span className="inline-block bg-blue-900 text-white text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded tracking-wide">
+                    NSO Official Portal
+                  </span>
+                  <div className="text-xs font-black text-slate-900 leading-tight mt-1">
+                    Airfare Price Index (APIx)
+                  </div>
+                </div>
               </div>
             )}
           </div>

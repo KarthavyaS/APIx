@@ -131,14 +131,22 @@ export const PolicyBulletinView: React.FC<PolicyBulletinViewProps> = ({
       <div id="official-bulletin-sheet" className="bg-white rounded-xl border-2 border-slate-300 p-6 sm:p-10 shadow-md">
         {/* Formal Header */}
         <div className="text-center pb-6 border-b-2 border-slate-900">
-          <div className="inline-block mb-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-600 block">
-              Government of India • भारत सरकार
+          <div className="flex flex-col items-center justify-center mb-2">
+            <img
+              src="/emblem.svg"
+              alt="State Emblem of India"
+              className="h-16 w-auto object-contain mb-2 drop-shadow-xs"
+            />
+            <span className="text-xs font-black uppercase tracking-widest text-[#993D00] block">
+              भारत सरकार • GOVERNMENT OF INDIA
             </span>
-            <span className="text-sm font-extrabold uppercase text-slate-900 block">
+            <span className="text-sm font-extrabold uppercase text-slate-900 block mt-0.5">
+              सांख्यिकी एवं कार्यक्रम कार्यान्वयन मंत्रालय
+            </span>
+            <span className="text-xs font-bold text-slate-700 block">
               Ministry of Statistics and Programme Implementation (MoSPI)
             </span>
-            <span className="text-xs font-bold text-indigo-900 block">
+            <span className="text-xs font-bold text-blue-950 block mt-0.5">
               National Statistical Office (NSO) — Price Statistics Division (PSD)
             </span>
           </div>

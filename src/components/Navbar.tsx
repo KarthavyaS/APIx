@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   TrendingUp,
   BarChart3,
-  Layers,
   HelpCircle,
   FileText,
   Eye,
@@ -76,12 +75,6 @@ export const Navbar: React.FC<NavbarProps> = ({
       icon: Activity,
     },
     {
-      id: 'heatmap',
-      labelEn: 'Route Price Matrix',
-      labelHi: 'रूट किराया मैट्रिक्स',
-      icon: Layers,
-    },
-    {
       id: 'airlines',
       labelEn: 'Airlines & OTAs Breakdown',
       labelHi: 'एयरलाइंस व टिकट पोर्टल',
@@ -133,14 +126,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* 2. Top GIGW Official Accessibility & Ministry Bar */}
       <div className="bg-slate-950 px-4 py-1.5 border-b border-slate-800/80 text-[11px] text-slate-300 flex flex-wrap justify-between items-center gap-2">
-        <div className="flex items-center space-x-2">
-          {/* Ashoka Pillar / Emblem Badge */}
-          <span className="font-semibold text-slate-200 tracking-wide flex items-center gap-1.5">
-            <span className="text-amber-400 font-serif font-bold text-xs">🏛️ भारत सरकार | Government of India</span>
+        <div className="flex items-center space-x-2.5">
+          {/* Real State Emblem of India */}
+          <img src="/emblem.svg" alt="State Emblem of India" className="h-5 w-auto object-contain shrink-0" />
+          <span className="font-bold text-slate-100 tracking-wide">
+            भारत सरकार | Government of India
           </span>
           <span className="text-slate-600">|</span>
           <span className="text-slate-400 hidden md:inline">
-            Ministry of Statistics & Programme Implementation (MoSPI) • National Statistical Office (NSO)
+            Ministry of Statistics & Programme Implementation (MoSPI) • NSO
           </span>
         </div>
 

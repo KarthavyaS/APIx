@@ -228,7 +228,6 @@ const SEEDED_ROUTES: Route[] = [
     quotes: { en: 'Live Data Harvest & Pipeline', hi: 'लाइव डेटा संकलन व पाइपलाइन' },
     guide: { en: 'Citizen Price Calculator & FAQ', hi: 'नागरिक किराया कैलकुलेटर व प्रश्न' },
     elasticity: { en: 'Advance Booking Savings (T+1 to T+45)', hi: 'अग्रिम बुकिंग बचत' },
-    heatmap: { en: 'Route Price Matrix & Heatmap', hi: 'रूट किराया मैट्रिक्स' },
     anomalies: { en: 'Price Surge Alerts', hi: 'किराया वृद्धि अलर्ट' },
     airlines: { en: 'Airlines & Booking Portals Share', hi: 'एयरलाइंस व बुकिंग पोर्टल' },
     forecast: { en: '14-Day Price Outlook', hi: '14-दिवसीय मूल्य अनुमान' },
@@ -344,9 +343,6 @@ const SEEDED_ROUTES: Route[] = [
           {/* Option: Advance Booking Savings / Elasticity */}
           {activeTab === 'elasticity' && <LeadTimeElasticityView elasticityData={elasticityData} />}
 
-          {/* Option: Route Matrix & Heatmap */}
-          {activeTab === 'heatmap' && <RouteHeatmap routes={routes} quotes={quotes} />}
-
           {/* Option: Price Surge Alerts */}
           {activeTab === 'anomalies' && (
             <AnomalyAlertsView
@@ -397,15 +393,22 @@ const SEEDED_ROUTES: Route[] = [
         <footer className="bg-slate-900 text-slate-300 text-xs border-t border-slate-800 py-8 mt-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-800">
-              <div>
-                <div className="text-white font-bold text-sm flex items-center gap-2">
-                  <span>🏛️ भारत सरकार | Government of India</span>
-                </div>
-                <div className="text-slate-400 text-xs mt-1">
-                  National Statistical Office (NSO) • Ministry of Statistics and Programme Implementation (MoSPI)
-                </div>
-                <div className="text-slate-500 text-[11px] mt-0.5">
-                  Price Statistics Division (PSD) — Consumer Price Index (CPI) Transport Framework
+              <div className="flex items-center space-x-3.5">
+                <img
+                  src="/emblem.svg"
+                  alt="State Emblem of India"
+                  className="h-12 w-auto object-contain brightness-0 invert opacity-90 shrink-0"
+                />
+                <div>
+                  <div className="text-white font-bold text-sm tracking-wide">
+                    भारत सरकार | Government of India
+                  </div>
+                  <div className="text-slate-400 text-xs mt-0.5">
+                    National Statistical Office (NSO) • Ministry of Statistics & Programme Implementation
+                  </div>
+                  <div className="text-slate-500 text-[11px] mt-0.5">
+                    Price Statistics Division (PSD) — Consumer Price Index (CPI) Aviation Framework
+                  </div>
                 </div>
               </div>
 
