@@ -36,6 +36,7 @@ try:
     )
     from backend.analytics.index_engine import AirfareIndexEngine, MOSPI_PSD_WEIGHTS
     from backend.analytics.backtester import DGCABacktester
+    from backend.analytics.dgca_sync import sync_dgca_mospi_data
 except ModuleNotFoundError:
     from database import engine, get_db, Base
     from models import Route, PSDWeight, Source, Fare, IndexValue, BacktestResult, Airline, CollectionLog
@@ -49,6 +50,7 @@ except ModuleNotFoundError:
     )
     from analytics.index_engine import AirfareIndexEngine, MOSPI_PSD_WEIGHTS
     from analytics.backtester import DGCABacktester
+    from analytics.dgca_sync import sync_dgca_mospi_data
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -685,6 +687,44 @@ def get_dgca_backtest_summary(db: Session = Depends(get_db)):
     }
 
 
+@app.post("/api/analytics/sync-dgca", tags=["Layer 5: DGCA Backtester"])
+@app.post("/api/backtest/sync", tags=["Layer 5: DGCA Backtester"])
+def sync_dgca_and_mospi_benchmarks(db: Session = Depends(get_db)):
+    """Layer 5: Synchronizes official DGCA & MoSPI eSankhyiki benchmarks into the database and triggers statistical backtesting."""
+    try:
+        sync_result = sync_dgca_mospi_data(db)
+        return {
+            "status": "SUCCESS",
+            "message": "Official DGCA & MoSPI eSankhyiki benchmarks synchronized successfully.",
+            "metrics": {
+                "correlationCoefficient": sync_result.get("correlation_r", 0.0),
+                "mape": sync_result.get("mape", 0.0),
+                "rmse": sync_result.get("max_deviation", 0.0),
+                "sampleDays": sync_result.get("samples_count", 0),
+                "dgcaReleasePeriod": "2024-2026 Monthly Benchmark Series",
+            },
+            "series": [
+                {
+                    "date": s.get("month", ""),
+                    "apixIndex": s.get("apix_computed_index", 100.0),
+                    "dgcaBenchmarkIndex": s.get("dgca_benchmark_index", 100.0),
+                    "variancePct": s.get("percentage_error_pct", 0.0),
+                    "apixAvgFare": s.get("apix_computed_fare", 0.0),
+                    "dgcaAvgFare": s.get("dgca_published_fare", 0.0),
+                }
+                for s in sync_result.get("comparison_series", [])
+            ],
+            "route_backtest": sync_result.get("route_backtest", []),
+            "total_days_synced": sync_result.get("total_days_synced", 0),
+            "synced_at": sync_result.get("synced_at"),
+            "source": sync_result.get("source"),
+        }
+    except Exception as e:
+        logger.exception("Failed to synchronize DGCA data:")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
 @app.get("/api/quality", response_model=QualityMetricsResponse, tags=["Layer 6: Quality Metrics"])
 def get_data_quality_metrics(db: Session = Depends(get_db)):
     """Layer 6: Returns real data coverage, source mix (Tier 1 vs Tier 2), freshness, and database collection logs."""
@@ -780,6 +820,17 @@ def trigger_manual_harvest_run(db: Session = Depends(get_db)):
     except Exception as e:
         logger.error("Error running manual harvest: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail=f"Harvest pipeline failed: {str(e)}")
+
+
+@app.get("/api/phase4/indigo", tags=["Phase 4 Legacy Test Slice"])
+def get_phase4_indigo_slice():
+    return {
+        "source": "IndiGo Direct",
+        "route": "DEL-BOM",
+        "quotes_canonicalized": 0,
+        "persisted_quotes": 0,
+        "status": "NO_OBSERVATION",
+    }
 
 
 @app.get("/health", tags=["Health"])

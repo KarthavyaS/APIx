@@ -98,6 +98,11 @@ def reset_database():
     session = SessionLocal()
     try:
         seed_metadata(session)
+        from backend.analytics.dgca_sync import sync_dgca_mospi_data
+        sync_dgca_mospi_data(session)
+        print("DGCA & MoSPI benchmark reference series initialized successfully.")
+    except Exception as e:
+        print(f"Note on DGCA sync: {e}")
     finally:
         session.close()
 

@@ -230,6 +230,28 @@ const SEEDED_ROUTES: Route[] = [
     await fetchAllData();
   };
 
+  // Sync DGCA & MoSPI benchmark reference series
+  const [isDgcaSyncing, setIsDgcaSyncing] = useState<boolean>(false);
+  const handleSyncDgca = async () => {
+    setIsDgcaSyncing(true);
+    showToast(language === 'hi' ? 'डीजीसीए और MoSPI आधिकारिक डेटा सिंक हो रहा है...' : 'Syncing official DGCA & MoSPI eSankhyiki benchmarks...');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/analytics/sync-dgca`, { method: 'POST' });
+      if (res.ok) {
+        const synced = await res.json();
+        setBacktestingData(synced.data || synced);
+        showToast(language === 'hi' ? 'डीजीसीए बेंचमार्क सफलतापूर्वक कैलिब्रेट किया गया।' : 'DGCA & MoSPI benchmark synced & validated successfully!');
+      } else {
+        showToast('Failed to sync DGCA benchmark data.');
+      }
+    } catch (err) {
+      showToast('Network error while syncing DGCA data.');
+    } finally {
+      setIsDgcaSyncing(false);
+      await fetchAllData();
+    }
+  };
+
   // Map active tab to human-readable breadcrumb title
   const tabTitles: Record<string, { en: string; hi: string }> = {
     overview: { en: 'National Price Overview', hi: 'राष्ट्रीय मूल्य अवलोकन' },
@@ -378,8 +400,13 @@ const SEEDED_ROUTES: Route[] = [
           )}
 
           {/* Option: DGCA Benchmark Validation */}
-          {activeTab === 'backtesting' && backtestingData && (
-            <DgcaBacktestingView backtestingData={backtestingData} />
+          {activeTab === 'backtesting' && (
+            <DgcaBacktestingView
+              backtestingData={backtestingData}
+              onSyncDgca={handleSyncDgca}
+              isSyncing={isDgcaSyncing}
+              language={language}
+            />
           )}
 
           {/* Option: API Explorer */}
