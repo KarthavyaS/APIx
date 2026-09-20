@@ -28,6 +28,7 @@ import {
   BacktestingComparison,
   ScrapingPipelineStatus,
 } from './types';
+import { API_BASE_URL } from './config';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function App() {
@@ -96,71 +97,71 @@ const SEEDED_ROUTES: Route[] = [
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Fetch initial data from Express REST API
+  // Fetch initial data from Express / FastAPI REST API
   const fetchAllData = async () => {
     try {
       // 1. Index summary
-      const idxRes = await fetch('/api/index');
+      const idxRes = await fetch(`${API_BASE_URL}/api/index`);
       if (idxRes.ok) {
         const idxData = await idxRes.json();
         setSummary((prev) => ({ ...prev, ...idxData }));
       }
 
       // 2. Daily history
-      const dailyRes = await fetch('/api/index/daily');
+      const dailyRes = await fetch(`${API_BASE_URL}/api/index/daily`);
       if (dailyRes.ok) setDailyData(await dailyRes.json());
 
       // 3. Weekly history
-      const weeklyRes = await fetch('/api/index/weekly');
+      const weeklyRes = await fetch(`${API_BASE_URL}/api/index/weekly`);
       if (weeklyRes.ok) setWeeklyData(await weeklyRes.json());
 
       // 4. Monthly history
-      const monthlyRes = await fetch('/api/index/monthly');
+      const monthlyRes = await fetch(`${API_BASE_URL}/api/index/monthly`);
       if (monthlyRes.ok) setMonthlyData(await monthlyRes.json());
 
       // 5. Routes
-      const routesRes = await fetch('/api/routes');
+      const routesRes = await fetch(`${API_BASE_URL}/api/routes`);
       if (routesRes.ok) setRoutes(await routesRes.json());
 
       // 6. Airlines
-      const airlinesRes = await fetch('/api/airlines');
+      const airlinesRes = await fetch(`${API_BASE_URL}/api/airlines`);
       if (airlinesRes.ok) setAirlines(await airlinesRes.json());
 
       // 7. Sources
-      const sourcesRes = await fetch('/api/sources');
+      const sourcesRes = await fetch(`${API_BASE_URL}/api/sources`);
       if (sourcesRes.ok) setSources(await sourcesRes.json());
 
       // 8. Fares
-      const faresRes = await fetch('/api/fares?limit=200');
+      const faresRes = await fetch(`${API_BASE_URL}/api/fares?limit=200`);
       if (faresRes.ok) {
         const faresData = await faresRes.json();
         setQuotes(faresData.quotes || []);
       }
 
       // 9. Anomalies
-      const anomRes = await fetch('/api/analytics/anomalies');
+      const anomRes = await fetch(`${API_BASE_URL}/api/analytics/anomalies`);
       if (anomRes.ok) {
         const anomData = await anomRes.json();
         setAnomalies(anomData.anomalies || []);
       }
 
       // 10. Forecast
-      const forecastRes = await fetch('/api/analytics/forecast');
+      const forecastRes = await fetch(`${API_BASE_URL}/api/analytics/forecast`);
       if (forecastRes.ok) {
         const fData = await forecastRes.json();
         setForecastData(fData.series || []);
       }
 
       // 11. Lead-time elasticity
-      const leadRes = await fetch('/api/analytics/lead-time');
+      const leadRes = await fetch(`${API_BASE_URL}/api/analytics/lead-time`);
       if (leadRes.ok) setElasticityData(await leadRes.json());
 
       // 12. Backtesting
-      const backtestRes = await fetch('/api/analytics/backtesting');
+      const backtestRes = await fetch(`${API_BASE_URL}/api/analytics/backtesting`);
       if (backtestRes.ok) setBacktestingData(await backtestRes.json());
 
       // 13. Pipeline status
-      const pipeRes = await fetch('/api/scraping/status');
+      const pipeRes = await fetch(`${API_BASE_URL}/api/scraping/status`);
       if (pipeRes.ok) setPipelineStatus(await pipeRes.json());
     } catch (err) {
       console.warn('API fetch warning, using seeded state:', err);
@@ -176,14 +177,21 @@ const SEEDED_ROUTES: Route[] = [
     setIsScrapingRunning(true);
     showToast(language === 'hi' ? 'उड़ान दरों का लाइव संकलन प्रारंभ हो रहा है...' : 'Harvesting live prices across airlines and travel portals...');
     try {
-      const res = await fetch('/api/scraping/run', { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/api/scraping/run`, { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
-        showToast(language === 'hi' ? `डेटा अपडेट पूर्ण! ${data.quotesHarvested} नई उड़ान दरें शामिल की गईं।` : `Harvest completed! ${data.quotesHarvested} verified quotes processed.`);
+        const count = data.quotesHarvested ?? data.result?.normalized_quotes_count ?? 0;
+        showToast(language === 'hi' ? `डेटा अपडेट पूर्ण! ${count} नई उड़ान दरें शामिल की गईं।` : `Harvest completed! ${count} verified quotes processed.`);
+        await fetchAllData();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        showToast(errData.detail || errData.message || 'Scraping cycle completed with warnings.');
         await fetchAllData();
       }
     } catch (err: any) {
-      showToast('Live harvest completed.');
+      console.error('Trigger scrape error:', err);
+      showToast('Live harvest request finished.');
+      await fetchAllData();
     } finally {
       setIsScrapingRunning(false);
     }
@@ -192,7 +200,7 @@ const SEEDED_ROUTES: Route[] = [
   // Toggle investigated state for anomaly
   const handleToggleInvestigated = async (anomalyId: string) => {
     try {
-      const res = await fetch(`/api/analytics/anomalies/${anomalyId}/investigate`, { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/api/analytics/anomalies/${anomalyId}/investigate`, { method: 'POST' });
       if (res.ok) {
         setAnomalies((prev) =>
           prev.map((a) => (a.id === anomalyId ? { ...a, isInvestigated: !a.isInvestigated } : a))
@@ -207,7 +215,7 @@ const SEEDED_ROUTES: Route[] = [
 
   // Save updated route weights
   const handleSaveWeights = async (newWeights: Record<string, number>) => {
-    const res = await fetch('/api/routes/weights', {
+    const res = await fetch(`${API_BASE_URL}/api/routes/weights`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ weights: newWeights }),

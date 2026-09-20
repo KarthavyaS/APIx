@@ -137,15 +137,46 @@ app = FastAPI(
     description="6-Layer Automated Live Aviation Intelligence System with APScheduler, Tier 1 & Tier 2 Collection, Jevons Index Engine, and DGCA Backtesting.",
     version="2.0.0",
     lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/api/openapi.json",
 )
+
+allowed_origins = [
+    "https://apix-frontend-2yuo.onrender.com",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+]
+
+# Allow custom frontend URLs via environment variables if provided
+frontend_url_env = os.getenv("FRONTEND_URL")
+if frontend_url_env and frontend_url_env not in allowed_origins:
+    allowed_origins.append(frontend_url_env)
+
+cors_origins_env = os.getenv("CORS_ORIGINS")
+if cors_origins_env:
+    for origin in cors_origins_env.split(","):
+        clean_origin = origin.strip()
+        if clean_origin and clean_origin not in allowed_origins:
+            allowed_origins.append(clean_origin)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/openapi.json", include_in_schema=False)
+def get_openapi_alias():
+    """Alias for /openapi.json pointing to OpenAPI specification."""
+    return app.openapi()
 
 
 # ---------------------------------------------------------------------------
@@ -737,12 +768,18 @@ def get_scheduler_runtime_status(db: Session = Depends(get_db)):
 @app.post("/api/scheduler/trigger", tags=["APScheduler"])
 def trigger_manual_harvest_run(db: Session = Depends(get_db)):
     """Manually triggers an immediate live harvest and index calculation cycle, storing quotes in the database."""
-    res = run_full_pipeline_sync(db=db)
-    return {
-        "success": True,
-        "message": "Live harvest and indexing cycle completed.",
-        "result": res,
-    }
+    try:
+        res = run_full_pipeline_sync(db=db)
+        quotes_count = res.get("normalized_quotes_count", 0) if isinstance(res, dict) else 0
+        return {
+            "success": True,
+            "message": "Live harvest and indexing cycle completed.",
+            "quotesHarvested": quotes_count,
+            "result": res,
+        }
+    except Exception as e:
+        logger.error("Error running manual harvest: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Harvest pipeline failed: {str(e)}")
 
 
 @app.get("/health", tags=["Health"])

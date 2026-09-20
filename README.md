@@ -4,6 +4,15 @@ An automated national aviation intelligence platform that ethically collects air
 
 ---
 
+## 🌐 Live Production Deployments (Render)
+
+- **Frontend Observatory Dashboard**: [https://apix-frontend-2yuo.onrender.com](https://apix-frontend-2yuo.onrender.com)
+- **Backend FastAPI Service**: [https://apix-backend-vusx.onrender.com](https://apix-backend-vusx.onrender.com)
+- **Interactive Swagger Documentation**: [https://apix-backend-vusx.onrender.com/docs](https://apix-backend-vusx.onrender.com/docs)
+- **OpenAPI 3.0 Schema**: [https://apix-backend-vusx.onrender.com/api/openapi.json](https://apix-backend-vusx.onrender.com/api/openapi.json)
+
+---
+
 ## 🏛️ System Architecture
 
 ```

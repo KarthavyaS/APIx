@@ -4,8 +4,12 @@ import { createServer as createViteServer } from 'vite';
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
-  const BACKEND_URL = process.env.BACKEND_URL || 'http://127.0.0.1:8000';
+  const PORT = Number(process.env.PORT) || 3000;
+  const BACKEND_URL =
+    process.env.BACKEND_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://apix-backend-vusx.onrender.com'
+      : 'http://127.0.0.1:8000');
 
   app.use(express.json());
 

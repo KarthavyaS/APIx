@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Code2, Play, Copy, Check, ExternalLink, Terminal } from 'lucide-react';
+import { Code2, Play, Copy, Check, ExternalLink, Terminal, BookOpen } from 'lucide-react';
+import { API_BASE_URL, BACKEND_DEPLOYED_URL } from '../config';
 
 export const ApiExplorerView: React.FC = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState('/api/index');
@@ -33,7 +34,7 @@ export const ApiExplorerView: React.FC = () => {
     setStatus(null);
     const start = performance.now();
     try {
-      const res = await fetch(selectedEndpoint);
+      const res = await fetch(`${API_BASE_URL}${selectedEndpoint}`);
       const end = performance.now();
       setLatencyMs(Math.round(end - start));
       setStatus(res.status);
@@ -47,7 +48,7 @@ export const ApiExplorerView: React.FC = () => {
     }
   };
 
-  const curlCommand = `curl -X GET "http://localhost:3000${selectedEndpoint}" -H "Accept: application/json"`;
+  const curlCommand = `curl -X GET "${BACKEND_DEPLOYED_URL}${selectedEndpoint}" -H "Accept: application/json"`;
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -69,7 +70,17 @@ export const ApiExplorerView: React.FC = () => {
 
         <div className="flex items-center space-x-2 text-xs">
           <a
-            href="/api/openapi.json"
+            href={`${BACKEND_DEPLOYED_URL}/docs`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center space-x-1 text-emerald-700 hover:text-emerald-900 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md font-medium"
+          >
+            <BookOpen className="w-3 h-3" />
+            <span>Interactive Swagger Docs</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+          <a
+            href={`${BACKEND_DEPLOYED_URL}/api/openapi.json`}
             target="_blank"
             rel="noreferrer"
             className="flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md font-mono"
