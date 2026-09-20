@@ -12,8 +12,8 @@ from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 from pathlib import Path
 
-from backend.models import BacktestResult, CollectionLog
-from backend.analytics.backtester import DGCABacktester, DGCA_PUBLISHED_MONTHLY_BENCHMARKS
+from models import BacktestResult, CollectionLog
+from analytics.backtester import DGCABacktester, DGCA_PUBLISHED_MONTHLY_BENCHMARKS
 
 logger = logging.getLogger("APIx.DGCASync")
 
