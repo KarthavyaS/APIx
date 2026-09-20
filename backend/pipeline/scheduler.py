@@ -238,29 +238,66 @@ def run_full_pipeline_sync(db=None) -> Dict[str, Any]:
         "is_fallback": False,
     })
 
-    # 6. Persist daily IndexValue record into index_values table
+    # 6. Persist daily IndexValue record into index_values table with same-day deduplication
     session_idx = db or SessionLocal()
     try:
-        db_index_val = IndexValue(
-            date=date.today(),
-            route_code="NATIONAL",
-            advance_window="ALL",
-            national_apix=index_result["national_apix"],
-            index_value=index_result["national_apix"],
-            base_period="2026-08-01",
-            daily_change_pct=0.0,
-            weekly_change_pct=0.0,
-            monthly_change_pct=0.0,
-            avg_fare_inr=index_result["avg_fare_inr"],
-            total_quotes=index_result["total_quotes"],
-            route_indices=index_result["route_indices"],
-            airline_indices=index_result["airline_indices"],
-            advance_window_indices=index_result["advance_window_curve"],
-            coverage_pct=index_result["coverage_pct"],
-            calculated_at=datetime.utcnow(),
-        )
-        session_idx.add(db_index_val)
-        session_idx.commit()
+        today_date = date.today()
+        existing_val = session_idx.query(IndexValue).filter(
+            IndexValue.date == today_date,
+            IndexValue.route_code == "NATIONAL"
+        ).order_by(IndexValue.id.desc()).first()
+
+        new_apix = float(index_result["national_apix"])
+        new_avg_fare = float(index_result["avg_fare_inr"])
+        new_quotes = int(index_result["total_quotes"])
+
+        if existing_val:
+            prev_apix = float(existing_val.national_apix or existing_val.index_value or 0.0)
+            prev_avg = float(existing_val.avg_fare_inr or 0.0)
+            prev_quotes = int(existing_val.total_quotes or 0)
+
+            is_duplicate = (
+                abs(prev_apix - new_apix) < 0.001
+                and abs(prev_avg - new_avg_fare) < 0.01
+                and prev_quotes == new_quotes
+            )
+
+            if is_duplicate:
+                logger.info("Same index data collected today (%s, APIx: %.2f). Avoiding duplicate entry.", today_date, prev_apix)
+            else:
+                logger.info("Updated market value observed today (%s): APIx %.2f -> %.2f, Quotes %d -> %d. Updating record.",
+                            today_date, prev_apix, new_apix, prev_quotes, new_quotes)
+                existing_val.national_apix = new_apix
+                existing_val.index_value = new_apix
+                existing_val.avg_fare_inr = new_avg_fare
+                existing_val.total_quotes = new_quotes
+                existing_val.route_indices = index_result["route_indices"]
+                existing_val.airline_indices = index_result["airline_indices"]
+                existing_val.advance_window_indices = index_result["advance_window_curve"]
+                existing_val.coverage_pct = index_result["coverage_pct"]
+                existing_val.calculated_at = datetime.utcnow()
+                session_idx.commit()
+        else:
+            db_index_val = IndexValue(
+                date=today_date,
+                route_code="NATIONAL",
+                advance_window="ALL",
+                national_apix=new_apix,
+                index_value=new_apix,
+                base_period="2026-08-01",
+                daily_change_pct=0.0,
+                weekly_change_pct=0.0,
+                monthly_change_pct=0.0,
+                avg_fare_inr=new_avg_fare,
+                total_quotes=new_quotes,
+                route_indices=index_result["route_indices"],
+                airline_indices=index_result["airline_indices"],
+                advance_window_indices=index_result["advance_window_curve"],
+                coverage_pct=index_result["coverage_pct"],
+                calculated_at=datetime.utcnow(),
+            )
+            session_idx.add(db_index_val)
+            session_idx.commit()
     except Exception as exc:
         logger.error("Error saving IndexValue to database: %s", exc)
         session_idx.rollback()

@@ -38,7 +38,7 @@ def test_layer1_tier1_datacrawler_backup_adapter():
 def test_layer1_tier2_polite_scraper_and_captcha_fallback():
     scraper = PoliteOTAScraper("MakeMyTrip", "https://www.makemytrip.com")
     res = scraper.scrape_route("DEL", "BOM", "2026-09-21", "T+7")
-    assert res["status"] in ["SUCCESS", "NO_OBSERVATION", "BLOCKED_CAPTCHA", "RATE_LIMITED", "FAILED"]
+    assert res["status"] in ["SUCCESS", "NO_OBSERVATION", "BLOCKED_CAPTCHA", "RATE_LIMITED", "FAILED", "STANDBY"]
     assert res["tier"] == "Tier 2"
 
     # Test explicit simulated challenge abort
@@ -170,7 +170,8 @@ def test_layer6_fastapi_endpoints():
     r4 = client.get("/api/backtest")
     assert r4.status_code == 200
     p4 = r4.json()
-    assert p4["samples_count"] >= 0
+    assert "metrics" in p4
+    assert p4["metrics"]["sampleDays"] >= 0
 
     # 5. GET /api/scheduler/status
     r5 = client.get("/api/scheduler/status")

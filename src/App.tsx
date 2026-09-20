@@ -250,11 +250,11 @@ const SEEDED_ROUTES: Route[] = [
   // Font size class mapping
   const fontSizeClass = fontSize === 'lg' ? 'text-base' : fontSize === 'sm' ? 'text-xs' : 'text-sm';
 
-  // Desktop sidebar offset
-  const mainOffsetClass = isCollapsed ? 'lg:pl-20' : 'lg:pl-80';
+  // Desktop sidebar offset responsive to zoom levels
+  const mainOffsetClass = isCollapsed ? 'lg:pl-20' : 'lg:pl-64 xl:pl-72';
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans bg-slate-50 text-slate-900 ${fontSizeClass}`}>
+    <div className={`min-h-screen flex flex-col font-sans bg-slate-50 text-slate-900 overflow-x-hidden ${fontSizeClass}`}>
       {/* Toast notification banner */}
       {toastMessage && (
         <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs font-medium flex items-center space-x-2 animate-in slide-in-from-bottom-5">
@@ -278,7 +278,7 @@ const SEEDED_ROUTES: Route[] = [
       />
 
       {/* 2. Main Content Area */}
-      <div className={`${mainOffsetClass} flex-1 flex flex-col min-h-screen transition-all duration-200`}>
+      <div className={`${mainOffsetClass} flex-1 flex flex-col min-h-screen transition-all duration-200 min-w-0`}>
         {/* Top Header */}
         <TopHeader
           summary={summary}
@@ -291,7 +291,7 @@ const SEEDED_ROUTES: Route[] = [
           activeTabTitle={currentTabTitle}
         />
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full grow">
+        <main className="w-full max-w-[1400px] xl:w-[75%] 2xl:w-[70%] mx-auto px-4 sm:px-6 lg:px-8 py-6 grow min-w-0">
           {/* CRITICAL FIX: The 4 Headline Metric boxes appear ONLY on the Overview tab so clicking any option displays that option's content directly at the top without scrolling! */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
