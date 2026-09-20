@@ -160,7 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Sidebar Container */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 bg-white text-slate-800 border-r border-slate-200 flex flex-col justify-between transition-all duration-200 ease-in-out lg:translate-x-0 ${
-          isCollapsed ? 'w-20' : 'w-64 xl:w-72'
+          isCollapsed ? 'w-20' : 'w-80'
         } ${isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}
       >
         {/* National Indian Tricolor Header Ribbon (GIGW Guidelines) */}

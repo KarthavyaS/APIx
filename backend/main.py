@@ -295,22 +295,12 @@ def get_index_summary(db: Session = Depends(get_db)):
 
 @app.get("/api/index/daily", tags=["Layer 4: Index Engine"])
 def get_daily_index_history(limit: int = Query(35, ge=1, le=365), db: Session = Depends(get_db)):
-    """Returns daily index time series from stored historical records, deduplicated by date."""
-    db_indices = db.query(IndexValue).filter(
-        IndexValue.route_code == "NATIONAL"
-    ).order_by(IndexValue.date.asc(), IndexValue.id.asc()).all()
-
-    if not db_indices:
-        # Fallback to any index_values if route_code was not tagged NATIONAL
-        db_indices = db.query(IndexValue).order_by(IndexValue.date.asc(), IndexValue.id.asc()).all()
-
+    """Returns daily index time series from stored historical records."""
+    db_indices = db.query(IndexValue).order_by(IndexValue.date.desc()).limit(limit).all()
     if db_indices:
-        # Deduplicate by date: keep the latest updated calculation per day
-        seen_dates: dict = {}
-        for iv in db_indices:
-            d_str = str(iv.date)
-            seen_dates[d_str] = {
-                "date": d_str,
+        return [
+            {
+                "date": str(iv.date),
                 "indexValue": float(iv.national_apix or iv.index_value or 100.0),
                 "basePeriod": str(iv.base_period or "2026-08-01"),
                 "dailyChangePct": float(iv.daily_change_pct or 0.0),
@@ -322,9 +312,8 @@ def get_daily_index_history(limit: int = Query(35, ge=1, le=365), db: Session = 
                 "airlineIndices": iv.airline_indices or {},
                 "advanceWindowIndices": iv.advance_window_indices or {},
             }
-        results = list(seen_dates.values())
-        return results[-limit:]
-
+            for iv in reversed(db_indices)
+        ]
     # Fallback to current live calculation if index history not yet accumulated
     fares = db.query(Fare).all()
     if fares:
@@ -791,16 +780,6 @@ def trigger_manual_harvest_run(db: Session = Depends(get_db)):
     except Exception as e:
         logger.error("Error running manual harvest: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail=f"Harvest pipeline failed: {str(e)}")
-
-
-@app.get("/api/phase4/indigo", tags=["Scrapers"])
-def get_phase4_indigo_status():
-    return {
-        "source": "IndiGo Direct",
-        "route": "DEL-BOM",
-        "quotes_canonicalized": 0,
-        "persisted_quotes": 0,
-    }
 
 
 @app.get("/health", tags=["Health"])

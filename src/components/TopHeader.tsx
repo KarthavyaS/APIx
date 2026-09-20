@@ -28,8 +28,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   activeTabTitle,
 }) => {
   return (
-    <header className="bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-2.5 sticky top-0 z-20 shadow-xs">
-      <div className="w-full max-w-[1400px] xl:w-[75%] 2xl:w-[70%] mx-auto flex flex-wrap justify-between items-center gap-3 min-w-0">
+    <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-2.5 sticky top-0 z-20 shadow-xs flex flex-wrap justify-between items-center gap-3">
       {/* Left: Hamburger + Official Ministry Hierarchy */}
       <div className="flex items-center space-x-3">
         <button
@@ -103,7 +102,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
               : 'Harvest Live'}
           </span>
         </button>
-      </div>
       </div>
     </header>
   );

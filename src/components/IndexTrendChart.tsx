@@ -27,56 +27,21 @@ export const IndexTrendChart: React.FC<IndexTrendChartProps> = ({
   const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [showSubRoutes, setShowSubRoutes] = useState(false);
 
-  // Transform data according to timeframe with same-day deduplication and latest value selection
+  // Transform data according to timeframe
   let chartData: any[] = [];
   if (timeframe === 'daily') {
-    // Deduplicate by date: keep the latest / updated distinct entry per day
-    const dateMap = new Map<string, IndexDataPoint>();
-    (dailyData || []).forEach((d) => {
-      if (d && d.date) {
-        dateMap.set(d.date, d);
-      }
-    });
-
-    const uniqueDaily = Array.from(dateMap.values());
-
-    if (uniqueDaily.length === 1 && uniqueDaily[0]) {
-      const current = uniqueDaily[0];
-      // Include Base Month reference point so the curve visualizes change from Base (100.0)
-      chartData = [
-        {
-          label: '08-01 (Base)',
-          fullDate: '2026-08-01 (Base Benchmark)',
-          headlineIndex: 100.0,
-          avgFare: 4500,
-        },
-        {
-          label: current.date ? current.date.slice(5) : 'Today',
-          fullDate: current.date || 'Today',
-          headlineIndex: current.indexValue ?? 100.0,
-          avgFare: current.avgFareInr ?? 0,
-          'DEL-BOM': current.routeIndices?.['DEL-BOM'],
-          'DEL-BLR': current.routeIndices?.['DEL-BLR'],
-          'BOM-BLR': current.routeIndices?.['BOM-BLR'],
-          'DEL-CCU': current.routeIndices?.['DEL-CCU'],
-          'BLR-HYD': current.routeIndices?.['BLR-HYD'],
-          'MAA-DEL': current.routeIndices?.['MAA-DEL'],
-        },
-      ];
-    } else {
-      chartData = uniqueDaily.map((d) => ({
-        label: d?.date ? d.date.slice(5) : 'N/A', // MM-DD
-        fullDate: d?.date || 'N/A',
-        headlineIndex: d?.indexValue ?? 100.0,
-        avgFare: d?.avgFareInr ?? 0,
-        'DEL-BOM': d?.routeIndices?.['DEL-BOM'],
-        'DEL-BLR': d?.routeIndices?.['DEL-BLR'],
-        'BOM-BLR': d?.routeIndices?.['BOM-BLR'],
-        'DEL-CCU': d?.routeIndices?.['DEL-CCU'],
-        'BLR-HYD': d?.routeIndices?.['BLR-HYD'],
-        'MAA-DEL': d?.routeIndices?.['MAA-DEL'],
-      }));
-    }
+    chartData = (dailyData || []).map((d) => ({
+      label: d?.date ? d.date.slice(5) : 'N/A', // MM-DD
+      fullDate: d?.date || 'N/A',
+      headlineIndex: d?.indexValue ?? 100.0,
+      avgFare: d?.avgFareInr ?? 0,
+      'DEL-BOM': d?.routeIndices?.['DEL-BOM'],
+      'DEL-BLR': d?.routeIndices?.['DEL-BLR'],
+      'BOM-BLR': d?.routeIndices?.['BOM-BLR'],
+      'DEL-CCU': d?.routeIndices?.['DEL-CCU'],
+      'BLR-HYD': d?.routeIndices?.['BLR-HYD'],
+      'MAA-DEL': d?.routeIndices?.['MAA-DEL'],
+    }));
   } else if (timeframe === 'weekly') {
     chartData = (weeklyData || []).map((w) => ({
       label: w?.weekNumber || 'W1',

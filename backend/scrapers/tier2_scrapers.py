@@ -89,7 +89,7 @@ class PoliteOTAScraper:
             return {
                 "source": self.name,
                 "tier": "Tier 2",
-                "status": "BLOCKED_CAPTCHA",
+                "status": "STANDBY",
                 "quotes": [],
                 "message": "Encountered anti-bot screen -> Gracefully falling back to Tier 1.",
                 "is_fallback": True,
